@@ -13,5 +13,6 @@
   <ItemGroup>
     <PackageReference Include="Amazon.Lambda.Core" Version="2.5.0" />
     <PackageReference Include="Amazon.Lambda.Serialization.SystemTextJson" Version="2.4.4" />
+    <PackageReference Include="AWS.Lambda.Powertools.Logging" Version="1.6.4" />
   </ItemGroup>
 </Project>
