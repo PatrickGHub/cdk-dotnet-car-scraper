@@ -1,5 +1,5 @@
 {
-  "app": "dotnet run --project src/DotnetAuCarScraper/DotnetAuCarScraper.csproj",
+  "app": "dotnet run --project src/CdkStack/DotnetAuCarScraper.csproj",
   "watch": {
     "include": [
       "**"
