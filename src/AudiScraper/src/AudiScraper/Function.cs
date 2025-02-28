@@ -52,12 +52,13 @@ public class Function
         {
             var (responseBody, error) = await CallEndpointLib.CallEndpoint(endpoint);
             if (error != null) return error.Message;
-
-            Logger.LogInformation($"Response received: {responseBody}");
+            
+            await S3Lib.PutS3Object(responseBody);
         }
 
-        catch
+        catch(Exception error)
         {
+            Logger.LogError(error);
             return "Error occurred";
         }
 
