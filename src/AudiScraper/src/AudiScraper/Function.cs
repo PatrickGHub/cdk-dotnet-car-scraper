@@ -1,7 +1,5 @@
 using Amazon.Lambda.Core;
 using AWS.Lambda.Powertools.Logging;
-using System.Net.Http;
-using System.Threading.Tasks;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
@@ -10,7 +8,7 @@ namespace AudiScraper;
 
 public class Function
 {
-    public async Task<string> FunctionHandler(string input, ILambdaContext context)
+    public async Task<string> FunctionHandler(ILambdaContext context)
     {
         Logger.LogInformation("Lambda invoked");
 
@@ -52,21 +50,17 @@ public class Function
 
         try
         {
-            HttpClient client = new();
-            HttpResponseMessage response = await client.GetAsync(endpoint);
-            response.EnsureSuccessStatusCode();
-            string responseBody = await response.Content.ReadAsStringAsync();
+            var (responseBody, error) = await CallEndpointLib.CallEndpoint(endpoint);
+            if (error != null) return error.Message;
+
             Logger.LogInformation($"Response received: {responseBody}");
         }
-        catch (HttpRequestException e)
+
+        catch
         {
-            Logger.LogError($"Request error: {e.Message}");
-        }
-        catch (Exception e)
-        {
-            Logger.LogError($"Unexpected error: {e.Message}");
+            return "Error occurred";
         }
 
-        return input.ToUpper();
+        return "Invocation complete";
     }
 }
