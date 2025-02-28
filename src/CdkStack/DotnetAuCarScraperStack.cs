@@ -1,5 +1,6 @@
 using Amazon.CDK;
 using Amazon.CDK.AWS.Lambda;
+using Amazon.CDK.AWS.S3;
 using Constructs;
 
 namespace DotnetAuCarScraper
@@ -25,15 +26,24 @@ namespace DotnetAuCarScraper
             var audiScraperLambda = new Function(this, "AudiScraperFunction", new FunctionProps
             {
                 FunctionName = "audi-scraper",
-                Runtime = Runtime.DOTNET_8,
-                Handler = "AudiScraper::AudiScraper.Function::FunctionHandler",
+
                 Code = Code.FromAsset("./src/AudiScraper/src/AudiScraper", new Amazon.CDK.AWS.S3.Assets.AssetOptions
                 {
                     Bundling = buildOption
                 }),
+                Handler = "AudiScraper::AudiScraper.Function::FunctionHandler",
                 MemorySize = 128,
+                Runtime = Runtime.DOTNET_8,
                 Timeout = Duration.Seconds(30)
             });
+
+            var audiScraperLambdaOutputBucket = new Bucket(this, "AudiScraperLambdaOutputBucket", new BucketProps
+            {
+                BlockPublicAccess = BlockPublicAccess.BLOCK_ALL,
+                BucketName = "audi-scraper-output-bucket",
+                Versioned = true,
+            }
+            );
         }
     }
 }
