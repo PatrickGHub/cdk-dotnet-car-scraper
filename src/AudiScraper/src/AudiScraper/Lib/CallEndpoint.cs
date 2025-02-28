@@ -4,11 +4,16 @@ public class CallEndpointLib
 {
   static public async Task<(string? result, Exception? error)> CallEndpoint(Uri endpoint)
   {
+    Logger.LogInformation($"Calling endpoint: {endpoint}");
+
     try
     {
       HttpClient client = new();
       HttpResponseMessage response = await client.GetAsync(endpoint);
       response.EnsureSuccessStatusCode();
+
+      Logger.LogInformation("Received response");
+
       return (await response.Content.ReadAsStringAsync(), null);
     }
 

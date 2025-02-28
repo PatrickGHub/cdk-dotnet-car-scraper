@@ -48,7 +48,7 @@ namespace DotnetAuCarScraper
                                 new PolicyStatement(new PolicyStatementProps
                                 {
                                     Actions = ["s3:PutObject"],
-                                    Resources = [audiScraperLambdaOutputBucket.BucketArn]
+                                    Resources = [$"{audiScraperLambdaOutputBucket.BucketArn}/*"]
                                 })
                             ]
                         })
