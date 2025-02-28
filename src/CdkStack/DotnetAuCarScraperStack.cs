@@ -52,6 +52,20 @@ namespace DotnetAuCarScraper
                                 })
                             ]
                         })
+                    },
+                    {
+                        "CloudWatchLogsPolicy",
+                        new PolicyDocument(new PolicyDocumentProps
+                        {
+                            Statements =
+                            [
+                                new PolicyStatement(new PolicyStatementProps
+                                {
+                                    Actions = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"],
+                                    Resources = ["*"]
+                                })
+                            ]
+                        })
                     }
                 }
             });
