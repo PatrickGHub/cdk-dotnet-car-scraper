@@ -3,6 +3,7 @@ using Amazon.CDK;
 using Amazon.CDK.AWS.IAM;
 using Amazon.CDK.AWS.Lambda;
 using Amazon.CDK.AWS.S3;
+using Amazon.CDK.AWS.S3.Notifications;
 using Constructs;
 
 namespace DotnetAuCarScraper
@@ -33,10 +34,10 @@ namespace DotnetAuCarScraper
                 ]
             };
 
-            var audiScraperLambdaExecutionRole = new Role(this, "audiScraperLambdaExecutionRole", new RoleProps
+            var audiLambdaExecutionRole = new Role(this, "audiLambdaExecutionRole", new RoleProps
             {
                 AssumedBy = new ServicePrincipal("lambda.amazonaws.com"),
-                RoleName = "audi-scraper-execution-role",
+                RoleName = "audi-lambda-execution-role",
                 InlinePolicies = new Dictionary<string, PolicyDocument>
                 {
                     {
@@ -47,7 +48,7 @@ namespace DotnetAuCarScraper
                             [
                                 new PolicyStatement(new PolicyStatementProps
                                 {
-                                    Actions = ["s3:PutObject"],
+                                    Actions = ["s3:GetObject", "s3:PutObject"],
                                     Resources = [$"{audiScraperLambdaOutputBucket.BucketArn}/*"]
                                 })
                             ]
@@ -81,9 +82,26 @@ namespace DotnetAuCarScraper
                 Handler = "AudiScraper::AudiScraper.Function::FunctionHandler",
                 MemorySize = 128,
                 Runtime = Runtime.DOTNET_8,
-                Role = audiScraperLambdaExecutionRole,
+                Role = audiLambdaExecutionRole,
                 Timeout = Duration.Seconds(30)
             });
+
+            var audiParserLambda = new Function(this, "AudiParserFunction", new FunctionProps
+            {
+                FunctionName = "audi-parser",
+
+                Code = Code.FromAsset("./src/AudiParser/src/AudiParser", new Amazon.CDK.AWS.S3.Assets.AssetOptions
+                {
+                    Bundling = buildOption
+                }),
+                Handler = "AudiParser::AudiParser.Function::FunctionHandler",
+                MemorySize = 128,
+                Runtime = Runtime.DOTNET_8,
+                Role = audiLambdaExecutionRole,
+                Timeout = Duration.Seconds(30)
+            });
+
+            audiScraperLambdaOutputBucket.AddEventNotification(EventType.OBJECT_CREATED_PUT, new LambdaDestination(audiParserLambda));
         }
     }
 }
