@@ -13,7 +13,6 @@ public class Function
         Logger.LogInformation("Lambda invoked");
 
         var (s3Object, s3Error) = await S3Lib.GetS3Object("2025-02-28.json");
-        Logger.LogInformation(s3Object);
         return null;
     }
 }
