@@ -3,6 +3,7 @@ using Amazon.CDK;
 using Amazon.CDK.AWS.IAM;
 using Amazon.CDK.AWS.Lambda;
 using Amazon.CDK.AWS.S3;
+using Amazon.CDK.AWS.S3.Notifications;
 using Constructs;
 
 namespace DotnetAuCarScraper
@@ -99,6 +100,8 @@ namespace DotnetAuCarScraper
                 Role = audiLambdaExecutionRole,
                 Timeout = Duration.Seconds(30)
             });
+
+            audiScraperLambdaOutputBucket.AddEventNotification(EventType.OBJECT_CREATED_PUT, new LambdaDestination(audiParserLambda));
         }
     }
 }
