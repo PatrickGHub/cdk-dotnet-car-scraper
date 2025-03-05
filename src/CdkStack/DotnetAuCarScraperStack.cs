@@ -1,5 +1,10 @@
 using System.Collections.Generic;
+using System.Data;
 using Amazon.CDK;
+using Amazon.CDK.AWS.ApplicationAutoScaling;
+using Amazon.CDK.AWS.Config;
+using Amazon.CDK.AWS.Events;
+using Amazon.CDK.AWS.Events.Targets;
 using Amazon.CDK.AWS.IAM;
 using Amazon.CDK.AWS.Lambda;
 using Amazon.CDK.AWS.S3;
@@ -100,6 +105,17 @@ namespace DotnetAuCarScraper
                 Role = audiLambdaExecutionRole,
                 Timeout = Duration.Seconds(30)
             });
+
+            var audiScraperLambdaSchedule = new Amazon.CDK.AWS.Events.Rule(this, "Audi scraper lambda schedule", new Amazon.CDK.AWS.Events.RuleProps
+            {
+                Schedule = Amazon.CDK.AWS.Events.Schedule.Cron(new Amazon.CDK.AWS.Events.CronOptions
+                {
+                    Hour = "12",
+                    Minute = "0"
+                })
+            });
+
+            audiScraperLambdaSchedule.AddTarget(new LambdaFunction(audiScraperLambda));
 
             audiScraperLambdaOutputBucket.AddEventNotification(EventType.OBJECT_CREATED_PUT, new LambdaDestination(audiParserLambda));
         }
