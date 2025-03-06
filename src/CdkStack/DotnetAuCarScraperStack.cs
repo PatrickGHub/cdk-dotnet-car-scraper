@@ -17,7 +17,8 @@ namespace DotnetAuCarScraper
             var audiDynamoDbTable = new TableV2(this, "audi-listings", new TablePropsV2
             {
                 PartitionKey = new Attribute { Name = "vin", Type = AttributeType.STRING },
-                SortKey = new Attribute { Name = "date", Type = AttributeType.STRING }
+                SortKey = new Attribute { Name = "date", Type = AttributeType.STRING },
+                TableName = "audi-listings"
             });
 
             var audiScraperLambdaOutputBucket = new Bucket(this, "AudiScraperLambdaOutputBucket", new BucketProps
