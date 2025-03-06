@@ -1,9 +1,6 @@
 using System.Collections.Generic;
-using System.Data;
 using Amazon.CDK;
-using Amazon.CDK.AWS.ApplicationAutoScaling;
-using Amazon.CDK.AWS.Config;
-using Amazon.CDK.AWS.Events;
+using Amazon.CDK.AWS.DynamoDB;
 using Amazon.CDK.AWS.Events.Targets;
 using Amazon.CDK.AWS.IAM;
 using Amazon.CDK.AWS.Lambda;
@@ -17,6 +14,12 @@ namespace DotnetAuCarScraper
     {
         internal DotnetAuCarScraperStack(Construct scope, string id, IStackProps props = null) : base(scope, id, props)
         {
+            var audiDynamoDbTable = new TableV2(this, "audi-listings", new TablePropsV2
+            {
+                PartitionKey = new Attribute { Name = "vin", Type = AttributeType.STRING },
+                SortKey = new Attribute { Name = "date", Type = AttributeType.STRING }
+            });
+
             var audiScraperLambdaOutputBucket = new Bucket(this, "AudiScraperLambdaOutputBucket", new BucketProps
             {
                 BlockPublicAccess = BlockPublicAccess.BLOCK_ALL,
@@ -46,20 +49,6 @@ namespace DotnetAuCarScraper
                 InlinePolicies = new Dictionary<string, PolicyDocument>
                 {
                     {
-                        "S3PutObjectPolicy",
-                        new PolicyDocument(new PolicyDocumentProps
-                        {
-                            Statements =
-                            [
-                                new PolicyStatement(new PolicyStatementProps
-                                {
-                                    Actions = ["s3:GetObject", "s3:PutObject"],
-                                    Resources = [$"{audiScraperLambdaOutputBucket.BucketArn}/*"]
-                                })
-                            ]
-                        })
-                    },
-                    {
                         "CloudWatchLogsPolicy",
                         new PolicyDocument(new PolicyDocumentProps
                         {
@@ -72,7 +61,39 @@ namespace DotnetAuCarScraper
                                 })
                             ]
                         })
-                    }
+                    },
+                    {
+                        "DynamoDBPolicy",
+                        new PolicyDocument(new PolicyDocumentProps
+                        {
+                            Statements =
+                            [
+                                new PolicyStatement(new PolicyStatementProps
+                                {
+                                    Actions = [
+                                        "dynamodb:BatchWriteItem",
+                                        "dynamodb:PutItem",
+                                        "dynamodb:UpdateItem",
+                                    ],
+                                    Resources = [$"{audiDynamoDbTable.TableArn}"]
+                                })
+                            ]
+                        })
+                    },
+                    {
+                        "S3ObjectPolicy",
+                        new PolicyDocument(new PolicyDocumentProps
+                        {
+                            Statements =
+                            [
+                                new PolicyStatement(new PolicyStatementProps
+                                {
+                                    Actions = ["s3:GetObject", "s3:PutObject"],
+                                    Resources = [$"{audiScraperLambdaOutputBucket.BucketArn}/*"]
+                                })
+                            ]
+                        })
+                    },
                 }
             });
 
