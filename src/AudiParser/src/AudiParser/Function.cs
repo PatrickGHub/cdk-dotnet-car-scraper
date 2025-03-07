@@ -2,6 +2,7 @@ using Amazon.DynamoDBv2;
 using Amazon.Lambda.Core;
 using Amazon.Lambda.S3Events;
 using AWS.Lambda.Powertools.Logging;
+using ListingLib;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 

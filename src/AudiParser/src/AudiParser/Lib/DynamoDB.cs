@@ -1,10 +1,11 @@
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
 using AWS.Lambda.Powertools.Logging;
+using ListingLib;
 
 public class DynamoDBLib
 {
-    static public async Task<(int? countOfStoredItems, Exception? error)> BatchWriteItems(AmazonDynamoDBClient client, List<Listings> listings)
+    static public async Task<(int? countOfStoredItems, Exception? error)> BatchWriteItems(AmazonDynamoDBClient client, List<Listing> listings)
     {
         try
         {
