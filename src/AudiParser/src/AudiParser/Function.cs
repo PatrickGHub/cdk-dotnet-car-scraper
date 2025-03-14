@@ -26,7 +26,6 @@ public class Function
             s3Object,
             new JsonSerializerOptions
             {
-                PropertyNameCaseInsensitive = true,
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             }
         );
