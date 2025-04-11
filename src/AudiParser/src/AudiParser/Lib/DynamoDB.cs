@@ -22,6 +22,7 @@ public class DynamoDBLib
         catch (Exception ex)
         {
             Logger.LogError("Failed to batch write items to DynamoDB");
+            Logger.LogError(ex.ToString());
             return (null, ex);
         }
     }

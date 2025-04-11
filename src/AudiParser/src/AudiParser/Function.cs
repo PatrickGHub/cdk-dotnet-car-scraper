@@ -22,15 +22,17 @@ public class Function
 
         var (s3Object, s3Error) = await S3Lib.GetS3Object(bucketEventObject);
 
-        var allListings = JsonSerializer.Deserialize<List<Listing>>(
+        VehicleData vehicleData = JsonSerializer.Deserialize<VehicleData>(
             s3Object,
             new JsonSerializerOptions
             {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             }
         );
 
-        var batchWriteResult = await DynamoDBLib.BatchWriteItems(dynamoDbClient, allListings);
+        List<Listing> listings = vehicleData.VehicleBasic;
+
+        var batchWriteResult = await DynamoDBLib.BatchWriteItems(dynamoDbClient, listings);
         return null;
     }
 }
