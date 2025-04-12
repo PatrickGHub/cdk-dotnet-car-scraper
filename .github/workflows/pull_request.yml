@@ -1,9 +1,9 @@
 name: CDK deploy
 
 on:
-  push:
-    paths-ignore:
-      - README.md
+  pull_request:
+    branches-ignore:
+      - main
 
 jobs:
   deploy:
@@ -26,7 +26,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.0.x
+          dotnet-version: 8.0.100
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
