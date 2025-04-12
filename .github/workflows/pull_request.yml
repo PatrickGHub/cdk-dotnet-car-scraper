@@ -36,7 +36,5 @@ jobs:
       - name: Install AWS CDK CLI
         run: npm install -g aws-cdk
 
-      - name: Restore and build .NET solution
-        run: |
-          dotnet restore
-          dotnet build --configuration Release
+      - name: Run CDK diff
+        run: cdk diff
