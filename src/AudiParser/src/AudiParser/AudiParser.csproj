@@ -15,6 +15,7 @@
     <PackageReference Include="Amazon.Lambda.S3Events" Version="3.1.0" />
     <PackageReference Include="Amazon.Lambda.Serialization.SystemTextJson" Version="2.4.4" />
     <PackageReference Include="AWS.Lambda.Powertools.Logging" Version="1.6.4" />
+    <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.7.405.35" />
     <PackageReference Include="AWSSDK.S3" Version="3.7.415.8" />
   </ItemGroup>
 </Project>

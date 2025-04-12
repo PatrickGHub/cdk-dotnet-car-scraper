@@ -73,6 +73,7 @@ namespace DotnetAuCarScraper
                                 {
                                     Actions = [
                                         "dynamodb:BatchWriteItem",
+                                        "dynamodb:DescribeTable",
                                         "dynamodb:PutItem",
                                         "dynamodb:UpdateItem",
                                     ],
