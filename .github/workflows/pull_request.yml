@@ -1,0 +1,40 @@
+name: CDK deploy dry run
+
+on:
+  pull_request:
+    paths-ignore:
+      - README.md
+
+jobs:
+  dry-run:
+    name: Cdk dry run
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.OIDC_ROLE }}
+          aws-region: eu-west-2
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.100
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+
+      - name: Install AWS CDK CLI
+        run: npm install -g aws-cdk
+
+      - name: Run CDK diff
+        run: cdk diff
