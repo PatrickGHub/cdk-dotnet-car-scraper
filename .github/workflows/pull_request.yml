@@ -6,8 +6,8 @@ on:
       - README.md
 
 jobs:
-  deploy:
-    name: Deploy CDK
+  dry-run:
+    name: Cdk dry run
     runs-on: ubuntu-latest
     permissions:
       id-token: write
