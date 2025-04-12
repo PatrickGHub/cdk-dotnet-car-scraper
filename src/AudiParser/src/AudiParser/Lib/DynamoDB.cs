@@ -1,29 +1,63 @@
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
+using Amazon.DynamoDBv2.Model;
 using AWS.Lambda.Powertools.Logging;
-using ListingLib;
+using AudiParser.Mappers;
+using AudiParser.Models;
 
 public class DynamoDBLib
 {
-    static public async Task<(int? countOfStoredItems, Exception? error)> BatchWriteItems(AmazonDynamoDBClient client, List<Listing> listings)
+    static public async Task BatchAndWriteItems(List<Listing> listings)
     {
+        var client = new AmazonDynamoDBClient();
+        var batchSize = 25;
+        int startSlice = 0;
+
         try
         {
-            Logger.LogInformation("Writing batch of items to DynamoDB table");
-            var dynamoDbContext = new DynamoDBContext(client);
+            while (startSlice < listings.Count)
+            {
+                var sliceOfListings = listings.GetRange(startSlice, Math.Min(batchSize, listings.Count - startSlice));
 
-            var listingsBatch = dynamoDbContext.CreateBatchWrite<Listing>();
-            listingsBatch.AddPutItems(listings);
+                var writeTasks = sliceOfListings
+                    .Select(async listing =>
+                    {
+                        var item = ListingMapper.ToAttributeMap(listing);
+                        item["date"] = new AttributeValue { S = DateTime.UtcNow.ToString("o") };
 
-            await listingsBatch.ExecuteAsync();
+                        var writeRequest = new WriteRequest
+                        {
+                            PutRequest = new PutRequest
+                            {
+                                Item = item
+                            }
+                        };
 
-            return (listings.Count, null);
+                        var batchWriteRequest = new BatchWriteItemRequest
+                        {
+                            RequestItems = new Dictionary<string, List<WriteRequest>>()
+                            {
+                                {
+                                    "audi-listings",
+                                    new List<WriteRequest> { writeRequest }
+                                }
+                            }
+                        };
+
+                        await client.BatchWriteItemAsync(batchWriteRequest);
+                    })
+                    .ToList();
+
+                await Task.WhenAll(writeTasks);
+                startSlice += batchSize;
+            }
+
         }
         catch (Exception ex)
         {
-            Logger.LogError("Failed to batch write items to DynamoDB");
+            Logger.LogError("Failed to write items to table");
             Logger.LogError(ex.ToString());
-            return (null, ex);
+            throw;
         }
     }
 }
