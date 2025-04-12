@@ -1,4 +1,4 @@
-name: CDK deploy
+name: CDK deploy dry run
 
 on:
   pull_request:
