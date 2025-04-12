@@ -7,7 +7,7 @@ using AudiParser.Models;
 
 public class DynamoDBLib
 {
-    static public async Task BatchAndWriteItems(List<Listing> listings)
+    static public async Task BatchAndWriteItems(List<Listing> listings, string dateScraped)
     {
         var client = new AmazonDynamoDBClient();
         var batchSize = 25;
@@ -23,7 +23,7 @@ public class DynamoDBLib
                     .Select(async listing =>
                     {
                         var item = ListingMapper.ToAttributeMap(listing);
-                        item["date"] = new AttributeValue { S = DateTime.UtcNow.ToString("o") };
+                        item["date"] = new AttributeValue { S = dateScraped };
 
                         var writeRequest = new WriteRequest
                         {
