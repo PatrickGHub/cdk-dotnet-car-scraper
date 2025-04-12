@@ -2,8 +2,8 @@ name: CDK deploy
 
 on:
   pull_request:
-    branches-ignore:
-      - main
+    paths-ignore:
+      - README.md
 
 jobs:
   deploy:
