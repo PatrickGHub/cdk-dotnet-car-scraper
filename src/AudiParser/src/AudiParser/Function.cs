@@ -17,9 +17,10 @@ public class Function
     {
         Logger.LogInformation(bucketEvent);
         Logger.LogInformation("Lambda invoked");
-        var bucketEventObject = bucketEvent.Records[0].S3.Object.Key;
+        string s3ObjectKey = bucketEvent.Records[0].S3.Object.Key;
+        string dateOfS3Object = s3ObjectKey.Split(".json")[0];
 
-        var (s3Object, s3Error) = await S3Lib.GetS3Object(bucketEventObject);
+        var (s3Object, s3Error) = await S3Lib.GetS3Object(s3ObjectKey);
 
         if (string.IsNullOrEmpty(s3Object))
         {
@@ -43,6 +44,6 @@ public class Function
 
         List<Listing> listings = vehicleData.VehicleBasic;
 
-        await DynamoDBLib.BatchAndWriteItems(listings);
+        await DynamoDBLib.BatchAndWriteItems(listings, dateOfS3Object);
     }
 }
