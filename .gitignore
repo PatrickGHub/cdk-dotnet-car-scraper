@@ -11,6 +11,7 @@ cdk.out
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
 # User-specific files
+.DS_Store
 *.suo
 *.user
 *.userosscache
