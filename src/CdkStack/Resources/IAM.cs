@@ -42,7 +42,10 @@ namespace DotnetAuCarScraper.Resources
                                         "dynamodb:PutItem",
                                         "dynamodb:UpdateItem",
                                     ],
-                                    Resources = [dynamoDbTable.TableArn]
+                                    Resources = [
+                                        dynamoDbTable.TableArn,
+                                        $"{dynamoDbTable.TableArn}/*"
+                                    ]
                                 })
                             ]
                         })
