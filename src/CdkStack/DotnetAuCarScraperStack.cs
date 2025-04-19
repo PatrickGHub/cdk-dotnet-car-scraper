@@ -12,6 +12,8 @@ namespace DotnetAuCarScraper
         internal DotnetAuCarScraperStack(Construct scope, string id, IStackProps props = null) : base(scope, id, props)
         {
             var audiDynamoDbTable = DynamoDbResources.CreateAudiListingsTable(this);
+            audiDynamoDbTable.AddGlobalSecondaryIndex(DynamoDbResources.ByDateIndex());
+            audiDynamoDbTable.AddGlobalSecondaryIndex(DynamoDbResources.ByModelIndex());
 
             var audiScraperLambdaOutputBucket = new Bucket(this, "AudiScraperLambdaOutputBucket", new BucketProps
             {

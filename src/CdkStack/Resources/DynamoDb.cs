@@ -14,5 +14,23 @@ namespace DotnetAuCarScraper.Resources
                 TableName = "audi-listings"
             });
         }
+
+        public static GlobalSecondaryIndexPropsV2 ByDateIndex()
+        {
+            return new GlobalSecondaryIndexPropsV2
+            {
+                IndexName = "audi-listings-by-date",
+                PartitionKey = new Attribute { Name = "date", Type = AttributeType.STRING }
+            };
+        }
+
+        public static GlobalSecondaryIndexPropsV2 ByModelIndex()
+        {
+            return new GlobalSecondaryIndexPropsV2
+            {
+                IndexName = "audi-listings-by-model",
+                PartitionKey = new Attribute { Name = "mbvHandbook", Type = AttributeType.STRING }
+            };
+        }
     }
 }
