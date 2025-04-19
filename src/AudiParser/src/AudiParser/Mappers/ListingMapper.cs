@@ -21,7 +21,7 @@ public static class ListingMapper
 			{ "gearType", new AttributeValue { S = listing.GearType.Description ?? "" } },
 			{ "kilometres", new AttributeValue { N = listing.Used.Mileage.ToString() ?? "0" } },
 			{ "lastChange", new AttributeValue { N = listing.LastChange.ToString() } },
-			{ "mbvHandbook", new AttributeValue { S = listing.MbvHandbook.Description ?? "" } },
+			{ "mbvHandbook", new AttributeValue { S = string.IsNullOrWhiteSpace(listing.MbvHandbook.Description) ? "unknown" : listing.MbvHandbook.Description } },
 			{ "modelYear", new AttributeValue { N = listing.ModelYear.ToString() } },
 			{ "price", new AttributeValue { N = listing.TypedPrices[0].Amount.ToString() ?? "0" } },
 			{ "symbolicCarline", new AttributeValue { S = listing.SymbolicCarline.Description ?? "" } },

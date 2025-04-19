@@ -12,7 +12,11 @@ public class Listing
     public required long AvailableFromDate { get; set; }
 
     [JsonPropertyName("bodyType")]
-    public required CodeWithDescription BodyType { get; set; }
+    public CodeWithDescription BodyType { get; set; } = new CodeWithDescription
+    {
+        Code = "",
+        Description = ""
+    };
 
     [JsonPropertyName("carId")]
     public required string CarId { get; set; }
@@ -39,19 +43,35 @@ public class Listing
     public required long LastChange { get; set; }
 
     [JsonPropertyName("mbvHandbook")]
-    public required CodeWithDescription MbvHandbook { get; set; }
+    public CodeWithDescription MbvHandbook { get; set; } = new CodeWithDescription
+    {
+        Code = "",
+        Description = "unknown"
+    };
 
     [JsonPropertyName("modelYear")]
     public required int ModelYear { get; set; }
 
     [JsonPropertyName("symbolicCarline")]
-    public required CodeWithDescription SymbolicCarline { get; set; }
+    public CodeWithDescription SymbolicCarline { get; set; } = new CodeWithDescription
+    {
+        Code = "",
+        Description = ""
+    };
 
     [JsonPropertyName("symbolicCarlineGroup")]
-    public required CodeWithDescription SymbolicCarlineGroup { get; set; }
+    public CodeWithDescription SymbolicCarlineGroup { get; set; } = new CodeWithDescription
+    {
+        Code = "",
+        Description = ""
+    };
 
     [JsonPropertyName("trimline")]
-    public required CodeWithDescription Trimline { get; set; }
+    public CodeWithDescription Trimline { get; set; } = new CodeWithDescription
+    {
+        Code = "",
+        Description = ""
+    };
 
     [JsonPropertyName("typedPrices")]
     public required List<TypedPrice> TypedPrices { get; set; }
@@ -69,10 +89,10 @@ public class Listing
 public class CodeWithDescription
 {
     [JsonPropertyName("code")]
-    public required string Code { get; set; }
+    public string Code { get; set; } = "";
 
     [JsonPropertyName("description")]
-    public string? Description { get; set; }
+    public string Description { get; set; } = "";
 }
 
 public class Dealer
@@ -99,10 +119,10 @@ public class TypedPrice
 public class Used
 {
     [JsonPropertyName("mileage")]
-    public required double Mileage { get; set; }
+    public double Mileage { get; set; } = 0;
 
     [JsonPropertyName("mileageUnit")]
-    public required string MileageUnit { get; set; }
+    public string MileageUnit { get; set; } = "km";
 }
 
 public class VehicleData

@@ -28,7 +28,7 @@ public class Function
             return;
         }
 
-        VehicleData? vehicleData = JsonSerializer.Deserialize<VehicleData>(
+        List<Listing>? listings = JsonSerializer.Deserialize<List<Listing>>(
             s3Object,
             new JsonSerializerOptions
             {
@@ -36,13 +36,11 @@ public class Function
             }
         );
 
-        if (vehicleData == null)
+        if (listings == null)
         {
             Logger.LogError("Failed to deserialize vehicle data");
             return;
         }
-
-        List<Listing> listings = vehicleData.VehicleBasic;
 
         await DynamoDBLib.BatchAndWriteItems(listings, dateOfS3Object);
     }
