@@ -30,7 +30,7 @@ namespace DotnetAuCarScraper.Resources
 				Code = Code.FromAsset("./src/AudiScraper/src/AudiScraper", new Amazon.CDK.AWS.S3.Assets.AssetOptions { Bundling = buildOptions }),
 				Runtime = Runtime.DOTNET_8,
 				Role = role,
-				MemorySize = 128,
+				MemorySize = 512,
 				Timeout = Duration.Seconds(30)
 			});
 		}
@@ -44,7 +44,7 @@ namespace DotnetAuCarScraper.Resources
 				Code = Code.FromAsset("./src/AudiParser/src/AudiParser", new Amazon.CDK.AWS.S3.Assets.AssetOptions { Bundling = buildOptions }),
 				Runtime = Runtime.DOTNET_8,
 				Role = role,
-				MemorySize = 128,
+				MemorySize = 512,
 				Timeout = Duration.Seconds(30)
 			});
 		}
