@@ -49,25 +49,10 @@ namespace DotnetAuCarScraper
             var apiGw = ApiGwResources.CreateApiGateway(this);
             var listings = apiGw.Root.AddResource("listings");
 		    var audiListingsResource = listings.AddResource("audi");
-            var getAudiListingsMethod = audiListingsResource.AddMethod("GET", new LambdaIntegration(retrieveAudiDataLambda), new MethodOptions
+            audiListingsResource.AddMethod("GET", new LambdaIntegration(retrieveAudiDataLambda), new MethodOptions
             {
                 ApiKeyRequired = true
             });
-
-            var deployment = new Deployment(scope, "ListingsApiDeployment", new DeploymentProps
-            {
-                Api = apiGw
-            });
-
-            deployment.Node.AddDependency(getAudiListingsMethod);
-
-            var stage = new Amazon.CDK.AWS.APIGateway.Stage(scope, "nonprod-stage", new Amazon.CDK.AWS.APIGateway.StageProps
-            {
-                Deployment = deployment,
-                StageName = "nonprod"
-            });
-
-            apiGw.DeploymentStage = stage;
         }
     }
 }

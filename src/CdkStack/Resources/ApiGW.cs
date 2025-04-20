@@ -23,6 +23,19 @@ namespace DotnetAuCarScraper.Resources
 				Enabled = true
 			});
 
+			var deployment = new Deployment(scope, $"listings-api-deployment-{System.DateTime.Now.Ticks}", new DeploymentProps
+			{
+					Api = api
+			});
+
+			var stage = new Amazon.CDK.AWS.APIGateway.Stage(scope, "nonprod-stage", new Amazon.CDK.AWS.APIGateway.StageProps
+			{
+					Deployment = deployment,
+					StageName = "nonprod"
+			});
+
+			api.DeploymentStage = stage;
+
 			var usagePlan = new UsagePlan(scope, "listings-api-usage-plan", new UsagePlanProps
 			{
 				Name = "listings-api-usage-plan",
