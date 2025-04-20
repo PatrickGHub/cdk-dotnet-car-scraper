@@ -1,4 +1,5 @@
 using Amazon.CDK;
+using Amazon.CDK.AWS.APIGateway;
 using Amazon.CDK.AWS.Events.Targets;
 using Amazon.CDK.AWS.S3;
 using Amazon.CDK.AWS.S3.Notifications;
@@ -27,6 +28,7 @@ namespace DotnetAuCarScraper
 
             var audiScraperLambda = LambdaFunctions.CreateAudiScraper(this, audiLambdaExecutionRole);
             var audiParserLambda = LambdaFunctions.CreateAudiParser(this, audiLambdaExecutionRole);
+            var retrieveAudiDataLambda = LambdaFunctions.CreateRetrieveAudiData(this, audiLambdaExecutionRole);
 
             var audiScraperLambdaSchedule = new Amazon.CDK.AWS.Events.Rule(this, "Audi scraper lambda schedule", new Amazon.CDK.AWS.Events.RuleProps
             {
@@ -40,6 +42,13 @@ namespace DotnetAuCarScraper
             audiScraperLambdaSchedule.AddTarget(new LambdaFunction(audiScraperLambda));
 
             audiScraperLambdaOutputBucket.AddEventNotification(EventType.OBJECT_CREATED_PUT, new LambdaDestination(audiParserLambda));
+
+            // var apiGw = ApiGwResources.CreateApiGateway(this);
+            // var listings = apiGw.Root.AddResource("listings");
+		    // listings.AddResource("audi").AddMethod("GET", new LambdaIntegration(retrieveAudiDataLambda), new MethodOptions
+            // {
+            //     ApiKeyRequired = true
+            // });
         }
     }
 }

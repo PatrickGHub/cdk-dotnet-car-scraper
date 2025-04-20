@@ -48,5 +48,19 @@ namespace DotnetAuCarScraper.Resources
 				Timeout = Duration.Seconds(30)
 			});
 		}
+
+		public static Function CreateRetrieveAudiData(Construct scope, IRole role)
+		{
+			return new Function(scope, "RetrieveAudiDataFunction", new FunctionProps
+			{
+				FunctionName = "retrieve-audi-data",
+				Handler = "RetrieveAudiData::RetrieveAudiData.Function::FunctionHandler",
+				Code = Code.FromAsset("./src/RetrieveAudiData/src/RetrieveAudiData", new Amazon.CDK.AWS.S3.Assets.AssetOptions { Bundling = buildOptions }),
+				Runtime = Runtime.DOTNET_8,
+				Role = role,
+				MemorySize = 512,
+				Timeout = Duration.Seconds(30)
+			});
+		}
 	}
 }
