@@ -40,6 +40,7 @@ namespace DotnetAuCarScraper.Resources
                                         "dynamodb:BatchWriteItem",
                                         "dynamodb:DescribeTable",
                                         "dynamodb:PutItem",
+                                        "dynamodb:Query",
                                         "dynamodb:UpdateItem",
                                     ],
                                     Resources = [

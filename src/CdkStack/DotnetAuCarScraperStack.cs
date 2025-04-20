@@ -1,4 +1,5 @@
 using Amazon.CDK;
+using Amazon.CDK.AWS.APIGateway;
 using Amazon.CDK.AWS.Events.Targets;
 using Amazon.CDK.AWS.S3;
 using Amazon.CDK.AWS.S3.Notifications;
@@ -11,6 +12,7 @@ namespace DotnetAuCarScraper
     {
         internal DotnetAuCarScraperStack(Construct scope, string id, IStackProps props = null) : base(scope, id, props)
         {
+            // Create DDB Table
             var audiDynamoDbTable = DynamoDbResources.CreateAudiListingsTable(this);
             audiDynamoDbTable.AddGlobalSecondaryIndex(DynamoDbResources.ByDateIndex());
             audiDynamoDbTable.AddGlobalSecondaryIndex(DynamoDbResources.ByModelIndex());
@@ -25,8 +27,10 @@ namespace DotnetAuCarScraper
 
             var audiLambdaExecutionRole = IAMResources.CreateAudiLambdaExecutionRole(this, audiDynamoDbTable, audiScraperLambdaOutputBucket);
 
+            // Create lambdas and triggers
             var audiScraperLambda = LambdaFunctions.CreateAudiScraper(this, audiLambdaExecutionRole);
             var audiParserLambda = LambdaFunctions.CreateAudiParser(this, audiLambdaExecutionRole);
+            var retrieveAudiDataLambda = LambdaFunctions.CreateRetrieveAudiData(this, audiLambdaExecutionRole);
 
             var audiScraperLambdaSchedule = new Amazon.CDK.AWS.Events.Rule(this, "Audi scraper lambda schedule", new Amazon.CDK.AWS.Events.RuleProps
             {
@@ -40,6 +44,15 @@ namespace DotnetAuCarScraper
             audiScraperLambdaSchedule.AddTarget(new LambdaFunction(audiScraperLambda));
 
             audiScraperLambdaOutputBucket.AddEventNotification(EventType.OBJECT_CREATED_PUT, new LambdaDestination(audiParserLambda));
+
+            // Create API GW, stage and deployment
+            var apiGw = ApiGwResources.CreateApiGateway(this);
+            var listings = apiGw.Root.AddResource("listings");
+		    var audiListingsResource = listings.AddResource("audi");
+            audiListingsResource.AddMethod("GET", new LambdaIntegration(retrieveAudiDataLambda), new MethodOptions
+            {
+                ApiKeyRequired = true
+            });
         }
     }
 }
