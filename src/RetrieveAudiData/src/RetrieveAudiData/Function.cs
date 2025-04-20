@@ -10,18 +10,22 @@ namespace RetrieveAudiData;
 
 public class Function
 {
-    public APIGatewayProxyResponse FunctionHandler(APIGatewayProxyRequest request, ILambdaContext context)
+    public async Task<APIGatewayProxyResponse> FunctionHandler(APIGatewayProxyRequest request, ILambdaContext context)
     {
-        var sortBy = request.QueryStringParameters != null && request.QueryStringParameters.TryGetValue("sortBy", out var value)
-            ? value
+        var sortBy = request.QueryStringParameters != null && request.QueryStringParameters.TryGetValue("sortBy", out var sortByValue)
+            ? sortByValue
             : "default";
 
-        var responseBody = $"Sorting by: {sortBy.ToUpper()}";
+        var date = request.QueryStringParameters != null && request.QueryStringParameters.TryGetValue("date", out var dateValue)
+            ? dateValue
+            : "default";
+
+        var items = await DynamoDBLib.QueryTodayListings(date);
 
         return new APIGatewayProxyResponse
         {
             StatusCode = (int)HttpStatusCode.OK,
-            Body = JsonSerializer.Serialize(new { message = responseBody }),
+            Body = JsonSerializer.Serialize(items),
             Headers = new Dictionary<string, string>
             {
                 { "Content-Type", "application/json" },
