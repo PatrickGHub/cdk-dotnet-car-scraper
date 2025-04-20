@@ -12,6 +12,7 @@ namespace DotnetAuCarScraper
     {
         internal DotnetAuCarScraperStack(Construct scope, string id, IStackProps props = null) : base(scope, id, props)
         {
+            // Create DDB Table
             var audiDynamoDbTable = DynamoDbResources.CreateAudiListingsTable(this);
             audiDynamoDbTable.AddGlobalSecondaryIndex(DynamoDbResources.ByDateIndex());
             audiDynamoDbTable.AddGlobalSecondaryIndex(DynamoDbResources.ByModelIndex());
@@ -26,6 +27,7 @@ namespace DotnetAuCarScraper
 
             var audiLambdaExecutionRole = IAMResources.CreateAudiLambdaExecutionRole(this, audiDynamoDbTable, audiScraperLambdaOutputBucket);
 
+            // Create lambdas and triggers
             var audiScraperLambda = LambdaFunctions.CreateAudiScraper(this, audiLambdaExecutionRole);
             var audiParserLambda = LambdaFunctions.CreateAudiParser(this, audiLambdaExecutionRole);
             var retrieveAudiDataLambda = LambdaFunctions.CreateRetrieveAudiData(this, audiLambdaExecutionRole);
@@ -43,12 +45,29 @@ namespace DotnetAuCarScraper
 
             audiScraperLambdaOutputBucket.AddEventNotification(EventType.OBJECT_CREATED_PUT, new LambdaDestination(audiParserLambda));
 
-            // var apiGw = ApiGwResources.CreateApiGateway(this);
-            // var listings = apiGw.Root.AddResource("listings");
-		    // listings.AddResource("audi").AddMethod("GET", new LambdaIntegration(retrieveAudiDataLambda), new MethodOptions
-            // {
-            //     ApiKeyRequired = true
-            // });
+            // Create API GW, stage and deployment
+            var apiGw = ApiGwResources.CreateApiGateway(this);
+            var listings = apiGw.Root.AddResource("listings");
+		    var audiListingsResource = listings.AddResource("audi");
+            var getAudiListingsMethod = audiListingsResource.AddMethod("GET", new LambdaIntegration(retrieveAudiDataLambda), new MethodOptions
+            {
+                ApiKeyRequired = true
+            });
+
+            var deployment = new Deployment(scope, "ListingsApiDeployment", new DeploymentProps
+            {
+                Api = apiGw
+            });
+
+            deployment.Node.AddDependency(getAudiListingsMethod);
+
+            var stage = new Amazon.CDK.AWS.APIGateway.Stage(scope, "nonprod-stage", new Amazon.CDK.AWS.APIGateway.StageProps
+            {
+                Deployment = deployment,
+                StageName = "nonprod"
+            });
+
+            apiGw.DeploymentStage = stage;
         }
     }
 }
