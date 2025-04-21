@@ -43,6 +43,44 @@ public class DynamoDBLib
 
         return result;
     }
+ 
+    public static async Task<List<Dictionary<string, object>>> QueryListingsModel(string model)
+    {
+        var client = new AmazonDynamoDBClient();
+
+        var table = Table.LoadTable(client, "audi-listings");
+        var filter = new QueryFilter("symbolicCarline", QueryOperator.Equal, model);
+
+        var config = new QueryOperationConfig
+        {
+            Filter = filter,
+            IndexName = "audi-listings-by-model"
+        };
+
+        var result = new List<Dictionary<string, object>>();
+        var search = table.Query(config);
+
+        do
+        {
+            var docs = await search.GetNextSetAsync();
+
+            foreach (var doc in docs)
+            {
+                var attrMap = doc.ToAttributeMap();
+
+                var flat = attrMap.ToDictionary(
+                    kvp => kvp.Key,
+                    kvp => ConvertAttributeValue(kvp.Value)
+                );
+
+                result.Add(flat);
+            }
+        }
+        while (!search.IsDone);
+
+        return result;
+    }
+ 
     public static async Task<List<Dictionary<string, object>>> QueryListingsVin(string vin)
     {
         var client = new AmazonDynamoDBClient();

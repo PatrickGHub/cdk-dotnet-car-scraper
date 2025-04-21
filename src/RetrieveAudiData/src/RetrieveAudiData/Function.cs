@@ -15,6 +15,11 @@ public class Function
         var query = request.QueryStringParameters != null && request.QueryStringParameters.TryGetValue("query", out var queryValue)
             ? queryValue
             : "default";
+        
+        if (query == null)
+        {
+            return Lib.HandleResponse.HandleBadRequestResponse("No query method passed");
+        }
 
         var items = new List<Dictionary<string, object>>();
 
@@ -27,10 +32,23 @@ public class Function
 
                 if (date == null)
                 {
-                    return Lib.HandleResponse.HandleBadRequestResponse("date");
+                    return Lib.HandleResponse.HandleBadRequestResponse("date query parameter is missing");
                 }
 
                 items = await DynamoDBLib.QueryListingsDate(date);
+                break;
+            
+            case "model":
+                var model = request.QueryStringParameters != null && request.QueryStringParameters.TryGetValue("model", out var modelValue)
+                ? modelValue
+                : null;
+
+                if (model == null)
+                {
+                    return Lib.HandleResponse.HandleBadRequestResponse("model query parameter is missing");
+                }
+
+                items = await DynamoDBLib.QueryListingsModel(model);
                 break;
             
             case "vin":
@@ -40,7 +58,7 @@ public class Function
 
                 if (vin == null)
                 {
-                    return Lib.HandleResponse.HandleBadRequestResponse("vin");
+                    return Lib.HandleResponse.HandleBadRequestResponse("vin query parameter is missing");
                 }
 
                 items = await DynamoDBLib.QueryListingsVin(vin);

@@ -6,12 +6,12 @@ namespace RetrieveAudiData.Lib;
 
 public class HandleResponse
 {
-	static public APIGatewayProxyResponse HandleBadRequestResponse(string input)
+	static public APIGatewayProxyResponse HandleBadRequestResponse(string message)
 	{
 		return new APIGatewayProxyResponse
 		{
 			StatusCode = (int)HttpStatusCode.BadRequest,
-			Body = JsonSerializer.Serialize(new { message = $"{input} query parameter is missing" }),
+			Body = JsonSerializer.Serialize(new { message }),
 			Headers = new Dictionary<string, string>
 			{
 				{ "Content-Type", "application/json" },
