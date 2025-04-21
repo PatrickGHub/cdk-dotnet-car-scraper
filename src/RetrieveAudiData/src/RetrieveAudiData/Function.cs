@@ -10,27 +10,46 @@ namespace RetrieveAudiData;
 
 public class Function
 {
-    public async Task<APIGatewayProxyResponse> FunctionHandler(APIGatewayProxyRequest request, ILambdaContext context)
+    static public async Task<APIGatewayProxyResponse> FunctionHandler(APIGatewayProxyRequest request, ILambdaContext context)
     {
-        var sortBy = request.QueryStringParameters != null && request.QueryStringParameters.TryGetValue("sortBy", out var sortByValue)
-            ? sortByValue
+        var query = request.QueryStringParameters != null && request.QueryStringParameters.TryGetValue("query", out var queryValue)
+            ? queryValue
             : "default";
 
-        var date = request.QueryStringParameters != null && request.QueryStringParameters.TryGetValue("date", out var dateValue)
-            ? dateValue
-            : "default";
+        var items = new List<Dictionary<string, object>>();
 
-        var items = await DynamoDBLib.QueryTodayListings(date);
-
-        return new APIGatewayProxyResponse
+        switch (query)
         {
-            StatusCode = (int)HttpStatusCode.OK,
-            Body = JsonSerializer.Serialize(items),
-            Headers = new Dictionary<string, string>
-            {
-                { "Content-Type", "application/json" },
-                { "Access-Control-Allow-Origin", "*" }
-            }
-        };
+            case "date":
+                var date = request.QueryStringParameters != null && request.QueryStringParameters.TryGetValue("date", out var dateValue)
+                ? dateValue
+                : null;
+
+                if (date == null)
+                {
+                    return Lib.HandleResponse.HandleBadRequestResponse("date");
+                }
+
+                items = await DynamoDBLib.QueryListingsDate(date);
+                break;
+            
+            case "vin":
+                var vin = request.QueryStringParameters != null && request.QueryStringParameters.TryGetValue("vin", out var vinValue)
+                ? vinValue
+                : null;
+
+                if (vin == null)
+                {
+                    return Lib.HandleResponse.HandleBadRequestResponse("vin");
+                }
+
+                items = await DynamoDBLib.QueryListingsVin(vin);
+                break;
+
+            default:
+                break;
+        }
+
+        return Lib.HandleResponse.HandleGoodResponse(items);
     }
 }
