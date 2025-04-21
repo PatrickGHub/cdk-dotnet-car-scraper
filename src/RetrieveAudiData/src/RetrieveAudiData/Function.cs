@@ -1,7 +1,6 @@
 using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
-using System.Net;
-using System.Text.Json;
+using AWS.Lambda.Powertools.Logging;
 
 // Assembly attribute
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
@@ -12,6 +11,7 @@ public class Function
 {
     static public async Task<APIGatewayProxyResponse> FunctionHandler(APIGatewayProxyRequest request, ILambdaContext context)
     {
+        Logger.LogInformation("Lambda invoked");
         var query = request.QueryStringParameters != null && request.QueryStringParameters.TryGetValue("query", out var queryValue)
             ? queryValue
             : "default";

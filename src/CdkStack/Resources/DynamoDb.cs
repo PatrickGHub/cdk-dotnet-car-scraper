@@ -29,7 +29,7 @@ namespace DotnetAuCarScraper.Resources
             return new GlobalSecondaryIndexPropsV2
             {
                 IndexName = "audi-listings-by-model",
-                PartitionKey = new Attribute { Name = "mbvHandbook", Type = AttributeType.STRING }
+                PartitionKey = new Attribute { Name = "symbolicCarline", Type = AttributeType.STRING }
             };
         }
     }

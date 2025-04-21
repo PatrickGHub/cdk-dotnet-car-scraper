@@ -1,15 +1,26 @@
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DocumentModel;
 using Amazon.DynamoDBv2.Model;
-using RetrieveAudiData.Mappers;
-using RetrieveAudiData.Models;
-using System.Text.Json;
+using AWS.Lambda.Powertools.Logging;
 
 public class DynamoDBLib
 {
+    private static AmazonDynamoDBClient GetClient()
+    {
+        AmazonDynamoDBClient? client = null;
+
+        if (client == null)
+        {
+            client = new AmazonDynamoDBClient();
+        }
+
+        return client;
+    }
+
     public static async Task<List<Dictionary<string, object>>> QueryListingsDate(string date)
     {
-        var client = new AmazonDynamoDBClient();
+        Logger.LogInformation($"Querying listings by date: {date}");
+        var client = GetClient();
 
         var table = Table.LoadTable(client, "audi-listings");
         var filter = new QueryFilter("date", QueryOperator.Equal, date);
@@ -46,7 +57,8 @@ public class DynamoDBLib
  
     public static async Task<List<Dictionary<string, object>>> QueryListingsModel(string model)
     {
-        var client = new AmazonDynamoDBClient();
+        Logger.LogInformation($"Querying listings by model: {model}");
+        var client = GetClient();
 
         var table = Table.LoadTable(client, "audi-listings");
         var filter = new QueryFilter("symbolicCarline", QueryOperator.Equal, model);
@@ -83,7 +95,8 @@ public class DynamoDBLib
  
     public static async Task<List<Dictionary<string, object>>> QueryListingsVin(string vin)
     {
-        var client = new AmazonDynamoDBClient();
+        Logger.LogInformation($"Querying listings by vin: {vin}");
+        var client = GetClient();
 
         var table = Table.LoadTable(client, "audi-listings");
         var filter = new QueryFilter("vin", QueryOperator.Equal, vin);
